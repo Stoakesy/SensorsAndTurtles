@@ -33,3 +33,10 @@ where `IP_ADDRESS` is the IP address of the turtlebot found in step 1. `-X` will
 Enter the default password `turtlebot`
 
 Further reading: https://unix.stackexchange.com/questions/12755/how-to-forward-x-over-ssh-to-run-graphics-applications-remotely
+
+## To Run Turtlebot
+
+1. roscore {remote pc}
+2. roslaunch turtlebot3_bringup turtlebot3_realsense.launch {turtlebot}
+3. roslaunch turtlebot3_bringup turtlebot3_core.launch {turtlebot}
+3. run rqt or rviz to view topics {remote pc}
