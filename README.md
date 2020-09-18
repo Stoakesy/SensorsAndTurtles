@@ -28,6 +28,8 @@ Host *
 
 `ssh -X turtlebot3@[IP_ADDRESS]`
 
-where `IP_ADDRESS` is the IP address of the turtlebot found in step 1. `-X` will enable X11 forwarding to allow the display to show on the remote PC
+where `IP_ADDRESS` is the IP address of the turtlebot found in step 1. `-X` will enable X11 forwarding to allow the display to show on the remote PC.
+
+Enter the default password `turtlebot`
 
 Further reading: https://unix.stackexchange.com/questions/12755/how-to-forward-x-over-ssh-to-run-graphics-applications-remotely
