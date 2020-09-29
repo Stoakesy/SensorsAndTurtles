@@ -1,0 +1,4 @@
+
+/** \mainpage Turtlebot Control
+
+The source files located here make up a ROS node that is used to control a robot given a target pose.
