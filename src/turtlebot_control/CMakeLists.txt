@@ -62,4 +62,4 @@ add_executable(${PROJECT_NAME}-main src/main.cpp src/control.cpp src/path_follow
 add_dependencies(${PROJECT_NAME}-main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}-main ${catkin_LIBRARIES} ${PROJECT_NAME}-path_planning ${PROJECT_NAME}-path_following ${OpenCV_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}-main ${catkin_LIBRARIES})

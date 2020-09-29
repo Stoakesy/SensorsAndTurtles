@@ -59,14 +59,7 @@ class Control
      * 
      * @param msg Refernce to the message received
     */
-    void poseCallback(const geometry_msgs::PoseArrayConstPtr & msg);
-
-    /**
-     * @brief Callback function to handle receiving a new odometry message
-     * 
-     * @param msg Refernce to the message received
-    */
-    void odomCallback(const nav_msgs::OdometryConstPtr& msg);
+    void poseCallback(const geometry_msgs::Pose & msg);
 
     /**
      * @brief Thread containing the main algorithm used in this program
@@ -82,9 +75,7 @@ class Control
     ros::Subscriber path_sub_;
     ros::Publisher velocity_pub_;
 
-    PathPlanning path_planning_;
     PathFollowing robot_control_;
-    Goal *next_goal_;
     
     bool robot_stopped_;
     bool use_pure_pursuit_;

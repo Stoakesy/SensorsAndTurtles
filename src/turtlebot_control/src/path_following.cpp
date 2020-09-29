@@ -16,22 +16,30 @@
 
 #include "path_following.h"
 
-PathFollowing::PathFollowing(int buffer_size):
-  RobotData(buffer_size),
+PathFollowing::PathFollowing():
   hysteresis_factor_(0),
   previous_heading_(0)
 {
   
 }
 
-bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, geometry_msgs::Pose goal, bool use_pure_pursuit)
+bool PathFollowing::setTargetPose(geometry_msgs::Pose target_pose)
 {
+  target_pose_.mtx.lock();
+  target_pose_.pose = target_pose;
+  target_pose_.mtx.unlock();
+  return true;
+}
+
+bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit)
+{
+  target_pose_.mtx.lock();
+  geometry_msgs::Pose goal = target_pose_.pose;
+  target_pose_.mtx.unlock();
   bool success = true;
-  geometry_msgs::Pose current_pose;
-  getLatestData(current_pose);
-  double desired_heading = (atan2(goal.position.y - current_pose.position.y, goal.position.x - current_pose.position.x));
+  double desired_heading = (atan2(goal.position.y, goal.position.x));
   // Convert from quaternion range
-  double current_heading = 2 * asin(current_pose.orientation.z);
+  double current_heading = 0;
 
   TurnDirection_t direction = STRAIGHT;
 
@@ -40,8 +48,8 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, geometry_m
   velocity.angular.z = 0;
 
   // If close to goal, rotate to correct orientation
-  bool within_x = (fabs(current_pose.position.x - goal.position.x) < ROBOT_RADIUS);
-  bool within_y = (fabs(current_pose.position.y - goal.position.y) < ROBOT_RADIUS);
+  bool within_x = (fabs(goal.position.x) < ROBOT_RADIUS);
+  bool within_y = (fabs(goal.position.y) < ROBOT_RADIUS);
   if (within_x && within_y)
   {
     desired_heading = goal.orientation.z;
@@ -98,13 +106,13 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, geometry_m
   if ((fabs(current_heading - desired_heading) < PURE_PURSUIT_THRESHOLD) && use_pure_pursuit)
   {
     double numerator = (
-      pow(current_pose.position.x - goal.position.x, 2) +
-      pow(current_pose.position.y - goal.position.y, 2)
+      pow(goal.position.x, 2) +
+      pow(goal.position.y, 2)
     );
 
     double denominator = 2 * (
-      (goal.position.y - current_pose.position.y) * cos(current_heading) -
-      (goal.position.x - current_pose.position.x) * sin(current_heading)
+      (goal.position.y) * cos(current_heading) -
+      (goal.position.x) * sin(current_heading)
     );
 
     double radius = numerator / denominator;
