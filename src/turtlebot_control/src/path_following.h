@@ -3,7 +3,7 @@
  *  @brief Class containing the main algorithms used to calculate the robot's actions:
  *
  *  This class contains functions that will be used to determine the required velocity
- *  of the robot to reach the next path.
+ *  of the robot to reach the next point.
  *
  *  @author Jacob Vartanian
  *  @date 2020-09-25
@@ -11,6 +11,9 @@
 
 #ifndef PATH_FOLLOWING_H
 #define PATH_FOLLOWING_H
+
+#define TURTLEBOT_LINEAR_SCALING 0.26
+#define TURTLEBOT_ANGULAR_SCALING 1.82
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Twist.h"
@@ -62,6 +65,15 @@ class PathFollowing
     bool setTargetPose(geometry_msgs::Pose target_pose);
 
     /**
+     * @brief Gets a zero velocity data type
+     * 
+     * @param velocity Reference to a velocity to set as zero
+     * 
+     * @return true if the operation was successful
+     */
+    bool getZeroVelocity(geometry_msgs::Twist &velocity);
+
+    /**
      * @brief Returns the required velocity of the robot to reach a given pose
      * 
      * @param velocity Reference to the required velocity of the robot to reach the next pose
@@ -74,13 +86,12 @@ class PathFollowing
   private:
     const double ANGULAR_THRESHOLD_RATIO = 0.05;
     const double HYSTERESIS_LEVEL = 0.5;
-    const double MAX_LINEAR_VELOCITY = 1.0;
-    const double MAX_ANGULAR_VELOCITY_FAST = 3.0;
-    const double MAX_ANGULAR_VELOCITY_SLOW = 0.5;
+    const double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
+    const double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
+    const double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6;
     const double PURE_PURSUIT_THRESHOLD = M_PI_4;
     const double ROBOT_RADIUS = 0.1;
     double hysteresis_factor_;
-    double previous_heading_;
     TargetPose target_pose_;
 };
 

@@ -22,9 +22,8 @@ Control::Control(ros::NodeHandle nh, bool use_pure_pursuit):
   use_pure_pursuit_(use_pure_pursuit)
 {
   // Initialise publishers and subscribers
-  path_sub_ = nh_.subscribe("robot_0/target_pose", 10, &Control::poseCallback,this);
-  velocity_pub_ = nh_.advertise<geometry_msgs::Twist>("robot_0/cmd_vel", 1);
-
+  path_sub_ = nh_.subscribe("target_pose", 10, &Control::poseCallback,this);
+  velocity_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   ros::NodeHandle pn("~");
 }
 

@@ -35,7 +35,6 @@
 
 #include "path_following.h"
 
-#define POINT_RADIUS 3
 #define MAIN_THREAD_DELAY_MS 150
 
 class Control

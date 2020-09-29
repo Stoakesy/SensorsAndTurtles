@@ -17,8 +17,7 @@
 #include "path_following.h"
 
 PathFollowing::PathFollowing():
-  hysteresis_factor_(0),
-  previous_heading_(0)
+  hysteresis_factor_(0)
 {
   
 }
@@ -31,6 +30,17 @@ bool PathFollowing::setTargetPose(geometry_msgs::Pose target_pose)
   return true;
 }
 
+bool PathFollowing::getZeroVelocity(geometry_msgs::Twist &velocity)
+{
+  velocity.linear.x = 0;
+  velocity.linear.y = 0;
+  velocity.linear.z = 0;
+  velocity.angular.x = 0;
+  velocity.angular.y = 0;
+  velocity.angular.z = 0;
+  return true;
+}
+
 bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit)
 {
   target_pose_.mtx.lock();
@@ -38,8 +48,6 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   target_pose_.mtx.unlock();
   bool success = true;
   double desired_heading = (atan2(goal.position.y, goal.position.x));
-  // Convert from quaternion range
-  double current_heading = 0;
 
   TurnDirection_t direction = STRAIGHT;
 
@@ -57,7 +65,7 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
 
   if (desired_heading < 0)
   {
-    if ((current_heading > desired_heading) && (current_heading <= M_PI + desired_heading))
+    if (M_PI + desired_heading > 0)
     {
       direction = CW;
     }
@@ -68,7 +76,7 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   }
   else
   {
-    if ((current_heading >= desired_heading - M_PI) && (current_heading < desired_heading))
+    if (desired_heading - M_PI < 0)
     {
       direction = CCW;
     }
@@ -85,7 +93,7 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   }
   else
   {
-    if (fabs(current_heading - desired_heading) < (ANGULAR_THRESHOLD_RATIO * (1 + hysteresis_factor_)))
+    if (fabs(desired_heading) < (ANGULAR_THRESHOLD_RATIO * (1 + hysteresis_factor_)))
     {
       // Drive
       velocity.linear.x = MAX_LINEAR_VELOCITY;
@@ -99,23 +107,15 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
     }
   }
 
-  bool crossed_negative_x_axis = (fabs(previous_heading_ - current_heading) > M_PI);
-  previous_heading_ = current_heading;
-
   // Pure Pursuit
-  if ((fabs(current_heading - desired_heading) < PURE_PURSUIT_THRESHOLD) && use_pure_pursuit)
+  if ((fabs(desired_heading) < PURE_PURSUIT_THRESHOLD) && use_pure_pursuit)
   {
     double numerator = (
       pow(goal.position.x, 2) +
       pow(goal.position.y, 2)
     );
 
-    double denominator = 2 * (
-      (goal.position.y) * cos(current_heading) -
-      (goal.position.x) * sin(current_heading)
-    );
-
-    double radius = numerator / denominator;
+    double radius = numerator / (2 * (goal.position.y));
 
     velocity.linear.x = MAX_LINEAR_VELOCITY;
     velocity.angular.z = MAX_LINEAR_VELOCITY / radius;
