@@ -56,10 +56,10 @@ include_directories(
 )
 
 ## Declare a C++ executable
-add_executable(${PROJECT_NAME}-main src/main.cpp src/control.cpp src/path_following.cpp)
+add_executable(${PROJECT_NAME}_main src/main.cpp src/control.cpp src/path_following.cpp)
 
 ## Add cmake target dependencies of the executable
-add_dependencies(${PROJECT_NAME}-main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_main ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}-main ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_main ${catkin_LIBRARIES})
