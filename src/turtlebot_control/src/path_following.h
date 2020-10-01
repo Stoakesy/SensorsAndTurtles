@@ -18,6 +18,7 @@
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Twist.h"
 #include <cmath>
+#include <list>
 #include <atomic>
 #include <mutex>
 
@@ -65,6 +66,21 @@ class PathFollowing
     bool setTargetPose(geometry_msgs::Pose target_pose);
 
     /**
+     * @brief Updates the parameters for the robot control
+     * 
+     * @param parameters CSV list of parameters in the following order:
+     *  - Angular Threshold Ratio
+     *  - Hysteresis Level
+     *  - Maximum linear velocity
+     *  - Maximum angular velocity (fast)
+     *  - Maximum angular velocity (slow)
+     *  - Pure pursuit angular threshold
+     * 
+     * @return true if the operation was successful
+     */
+    bool updateParameters(const char* parameters);
+
+    /**
      * @brief Gets a zero velocity data type
      * 
      * @param velocity Reference to a velocity to set as zero
@@ -84,13 +100,14 @@ class PathFollowing
     bool calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit);
 
   private:
-    const double ANGULAR_THRESHOLD_RATIO = 0.05;
-    const double HYSTERESIS_LEVEL = 0.5;
-    const double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
-    const double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
-    const double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6;
-    const double PURE_PURSUIT_THRESHOLD = M_PI_4;
-    const double ROBOT_RADIUS = 0.1;
+    const double EXPECTED_NUMBER_OF_PARAMETERS = 6;
+    double ANGULAR_THRESHOLD_RATIO = 0.05;
+    double HYSTERESIS_LEVEL = 0.5;
+    double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
+    double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
+    double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6;
+    double PURE_PURSUIT_THRESHOLD = M_PI_4;
+    double ROBOT_RADIUS = 0.1;
     double hysteresis_factor_;
     TargetPose target_pose_;
 };

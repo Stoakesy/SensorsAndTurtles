@@ -61,17 +61,23 @@ class Control
     void poseCallback(const geometry_msgs::Pose & msg);
 
     /**
+     * @brief Callback function to handle receiving a new parameters message
+     * 
+     * @param msg Refernce to the message received
+    */
+    void paramCallback(const std_msgs::String::ConstPtr & msg);
+
+    /**
      * @brief Thread containing the main algorithm used in this program
     */
     void mainThread(void);
 
   private:
-    const int VEHICLE_POSE_BUFFER_SIZE = 100;
-
     ros::NodeHandle nh_;
     
     ros::Subscriber odom_sub_;
-    ros::Subscriber path_sub_;
+    ros::Subscriber pose_sub_;
+    ros::Subscriber param_sub_;
     ros::Publisher velocity_pub_;
 
     PathFollowing robot_control_;

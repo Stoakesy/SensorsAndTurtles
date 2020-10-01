@@ -30,6 +30,52 @@ bool PathFollowing::setTargetPose(geometry_msgs::Pose target_pose)
   return true;
 }
 
+bool PathFollowing::updateParameters(const char* parameters)
+{
+  bool success = false;
+  std::list<std::string> values;
+  std::string next_value = "";
+  for (unsigned int i = 0; i < strlen(parameters); ++i)
+  {
+    if (parameters[i] == ',')
+    {
+      values.push_back(next_value);
+      next_value = "";
+    }
+    else
+    {
+      next_value += parameters[i];
+    }
+  }
+  values.push_back(next_value);
+  std::list<double> convertedValues;
+    for(auto it = values.begin(); it != values.end(); ++it)
+    {
+        std::string nextValue = values.front();
+        values.pop_front();
+        double result = std::stod(nextValue);
+        convertedValues.push_back(result);
+    }
+
+  if (convertedValues.size() == EXPECTED_NUMBER_OF_PARAMETERS)
+  {
+    ANGULAR_THRESHOLD_RATIO = convertedValues.front();
+    convertedValues.pop_front();
+    HYSTERESIS_LEVEL = convertedValues.front();
+    convertedValues.pop_front();
+    MAX_LINEAR_VELOCITY = convertedValues.front();
+    convertedValues.pop_front();
+    MAX_ANGULAR_VELOCITY_FAST = convertedValues.front();
+    convertedValues.pop_front();
+    MAX_ANGULAR_VELOCITY_SLOW = convertedValues.front();
+    convertedValues.pop_front();
+    PURE_PURSUIT_THRESHOLD = convertedValues.front();
+    convertedValues.pop_front();
+    success = true;
+  }
+  return success;
+}
+
 bool PathFollowing::getZeroVelocity(geometry_msgs::Twist &velocity)
 {
   velocity.linear.x = 0;
