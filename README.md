@@ -45,6 +45,9 @@ Further reading: https://unix.stackexchange.com/questions/12755/how-to-forward-x
 http://wiki.ros.org/image_view
 
 `rosrun image_view image_view image:=<image topic> [image transport type]`
+
 For example:
+
 `rosrun image_view image_view image:=/camera/color/image_raw`
+
 Save the current image by right-clicking on the display window.
