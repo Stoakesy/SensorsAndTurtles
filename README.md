@@ -40,3 +40,11 @@ Further reading: https://unix.stackexchange.com/questions/12755/how-to-forward-x
 2. roslaunch turtlebot3_bringup turtlebot3_realsense.launch {turtlebot}
 3. roslaunch turtlebot3_bringup turtlebot3_core.launch {turtlebot}
 3. run rqt or rviz to view topics {remote pc}
+
+## To show and save images
+http://wiki.ros.org/image_view
+
+`rosrun image_view image_view image:=<image topic> [image transport type]`
+For example:
+`rosrun image_view image_view image:=/camera/color/image_raw`
+Save the current image by right-clicking on the display window.
