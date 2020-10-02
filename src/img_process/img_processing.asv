@@ -1,0 +1,52 @@
+
+load('Calib_Results.mat', 'fc', 'cc', 'nx', 'ny');
+
+intrinsics = cameraIntrinsics(fc', cc', [ny nx]);
+
+tagSize = 0.128;
+
+worldPoints = [0 0 0; tagSize/2 0 0; 0 tagSize/2 0; 0 0 tagSize/2];
+
+posepub = rospublisher('/target_pose', 'geometry_msgs/Pose');
+
+rosimg = rossubscriber('/camera/color/image_raw');
+
+pause(2);
+
+posemsg = rosmessage(posepub);
+
+while(1)
+    imgdata = receive(rosimg, 5);
+    
+    I = readImage(imgdata);
+
+    I = undistortImage(I,intrinsics,"OutputView","same");
+
+    [id,loc,pose] = readAprilTag(I,"tag36h11",intrinsics,tagSize);
+    
+    [posemsg.Position.x, posemsg.Position.xposemsg.Position.x = pose.Translation;
+    posemsg.Orientation = rotm2quat(pose.Rotation);
+    
+    send(posepub, posemsg);
+    
+    pause(2);
+
+%     for i = 1:length(pose)
+%         % Get image coordinates for axes.
+%         imagePoints = worldToImage(intrinsics,pose(i).Rotation, ...
+%                       pose(i).Translation,worldPoints);
+% 
+%         % Insert markers to indicate the locations
+%         markerRadius = 8;
+%         numCorners = size(loc,1);
+%         markerPosition = [loc(:,:,i),repmat(markerRadius,numCorners,1)];
+%         I = insertShape(I,"FilledCircle",markerPosition,"Color","red","Opacity",1);
+% 
+%         % Draw colored axes.
+%         I = insertShape(I,"Line",[imagePoints(1,:) imagePoints(2,:); ...
+%             imagePoints(1,:) imagePoints(3,:); imagePoints(1,:) imagePoints(4,:)], ...
+%             "Color",["red","green","blue"],"LineWidth",7);
+% 
+%     %     I = insertText(I,loc(1,:,i),id(i),"BoxOpacity",1,"FontSize",25);
+%     end
+ end
