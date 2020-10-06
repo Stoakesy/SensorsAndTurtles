@@ -55,6 +55,7 @@ class Ui_RobotTuning(object):
         self.purePursuit = default_purePursuit
         self.angular = default_angular
         self.goalDistance = default_goalDistance
+        self.isActive = 1.0
 
         ##################### VARIABLES #####################
         # Linear Velocity
@@ -209,9 +210,6 @@ class Ui_RobotTuning(object):
         self.AV_Label_5.setText(_translate("RobotTuning", "Angular Threshold:"))
         self.AV_Label_6.setText(_translate("RobotTuning", "Goal Distance:"))
 
-    def stopPressed(self):
-        print("Stopped pressed")
-
     def resetPressed(self):
         self.LinVel.setText(f"{default_linear_velocity}")
         self.AngVel.setText(f"{default_angular_velocity}")
@@ -229,8 +227,13 @@ class Ui_RobotTuning(object):
         self.angularTextChanged()
         self.goalDistTextChanged()
 
+    def stopPressed(self):
+        print("Stopped pressed")
+        self.isActive = 0.0
+
     def resumePressed(self):
         print("Resume pressed")
+        self.isActive = 1.0
 
     def mapValue(self, sliderValue, maxValue):
         return maxValue * (sliderValue / 100.0)
@@ -291,6 +294,18 @@ class Ui_RobotTuning(object):
 
     def goalDistTextChanged(self):
         self.GoalDistanceSlider.setValue(self.mapToSlider(self.GoalDistance.text(), max_goalDistance))
+
+    def getParameters(self):
+        return "{0:.4f},{1:.4f},{2:.4f},{3:.4f},{4:.4f},{5:.4f},{6:.4f},{7:.4f}".format(
+            self.linear_velocity,
+            self.angular_velocity,
+            self.slowTurnMultiplier,
+            self.hysteresis,
+            self.purePursuit,
+            self.angular,
+            self.goalDistance,
+            self.isActive
+        )
     
 if __name__ == "__main__":
     import sys
