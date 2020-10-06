@@ -89,12 +89,14 @@ bool PathFollowing::getZeroVelocity(geometry_msgs::Twist &velocity)
 
 bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit)
 {
+  std::cout << "---------------------------------------------------" << std::endl;
   target_pose_.mtx.lock();
   geometry_msgs::Pose goal = target_pose_.pose;
   target_pose_.mtx.unlock();
   bool success = true;
-  double desired_heading = (atan2(goal.position.y, goal.position.x));
-
+  double desired_heading = (atan2(goal.position.x, goal.position.z));
+  std::cout << "Target is " << goal.position.z << "m in front and " << goal.position.x << "m right" << std::endl;
+  std::cout << "Target angle is therefore: " << (desired_heading * 180 / M_PI) << " degrees clockwise" << std::endl;
   TurnDirection_t direction = STRAIGHT;
 
   // Reset velocity
@@ -102,39 +104,34 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   velocity.angular.z = 0;
 
   // If close to goal, rotate to correct orientation
+  bool within_z = (fabs(goal.position.z) < ROBOT_RADIUS);
   bool within_x = (fabs(goal.position.x) < ROBOT_RADIUS);
-  bool within_y = (fabs(goal.position.y) < ROBOT_RADIUS);
-  if (within_x && within_y)
+  if (within_z && within_x)
   {
-    desired_heading = goal.orientation.z;
-  }
-
-  if (desired_heading < 0)
-  {
-    if (M_PI + desired_heading > 0)
-    {
-      direction = CW;
-    }
-    else
-    {
-      direction = CCW;
-    }
+    desired_heading = goal.orientation.y;
+    std::cout << "Target is close to goal. Rotating to target by " << (desired_heading * 180 / M_PI) << " degrees clockwise" << std::endl;
   }
   else
   {
-    if (desired_heading - M_PI < 0)
-    {
-      direction = CCW;
-    }
-    else
-    {
-      direction = CW;
-    }
+    std::cout << "Target is NOT close to goal. Rotating to target by " << (desired_heading * 180 / M_PI) << " degrees clockwise" << std::endl;
+  }
+  
+
+  if (desired_heading < 0)
+  {
+    std::cout << "Robot turning CCW" << std::endl;
+    direction = CCW;
+  }
+  else
+  {
+    std::cout << "Robot turning CW" << std::endl;
+    direction = CW;
   }
 
-  if (within_x && within_y)
+  if (within_z && within_x)
   {
     velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_FAST;
+    std::cout << "Target is close to goal. Rotating at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
     return success;
   }
   else
@@ -144,27 +141,36 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
       // Drive
       velocity.linear.x = MAX_LINEAR_VELOCITY;
       hysteresis_factor_ = HYSTERESIS_LEVEL;
+      std::cout << "Target within threshold. Driving at " << velocity.linear.x << " m/s" << std::endl;
     }
     else
     {
       hysteresis_factor_ = 0;
       // Turn
       velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_SLOW;
+      std::cout << "Target NOT within threshold. Turning slowly at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
+      return success;
     }
   }
 
   // Pure Pursuit
   if ((fabs(desired_heading) < PURE_PURSUIT_THRESHOLD) && use_pure_pursuit)
   {
+    std::cout << "Undertaking Pure Pursuit" << std::endl;
     double numerator = (
-      pow(goal.position.x, 2) +
-      pow(goal.position.y, 2)
+      pow(goal.position.z, 2) +
+      pow(goal.position.x, 2)
     );
 
-    double radius = numerator / (2 * (goal.position.y));
+    double radius = numerator / (2 * (goal.position.x));
 
     velocity.linear.x = MAX_LINEAR_VELOCITY;
     velocity.angular.z = MAX_LINEAR_VELOCITY / radius;
   }
+  else
+  {
+    std::cout << "No Pure Pursuit" << std::endl;
+  }
+  
   return success;
 }
