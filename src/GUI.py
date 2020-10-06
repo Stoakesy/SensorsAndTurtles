@@ -17,6 +17,8 @@ class Ui_RobotTuning(object):
         self.Stop = QtWidgets.QPushButton(self.centralwidget)
         self.Stop.setGeometry(QtCore.QRect(20, 330, 131, 51))
         self.Stop.setObjectName("Stop")
+        self.Stop.clicked.connect(lambda: self.stopButtonPressed())
+
         self.AV_Slider = QtWidgets.QSlider(self.centralwidget)
         self.AV_Slider.setGeometry(QtCore.QRect(140, 60, 160, 16))
         self.AV_Slider.setOrientation(QtCore.Qt.Horizontal)
@@ -24,6 +26,7 @@ class Ui_RobotTuning(object):
         self.AV_Slider.setMinimum(0)
         self.AV_Slider.setMaximum(100)
         self.AV_Slider.setValue(0)
+
         self.LV_Slider = QtWidgets.QSlider(self.centralwidget)
         self.LV_Slider.setGeometry(QtCore.QRect(140, 100, 160, 16))
         self.LV_Slider.setOrientation(QtCore.Qt.Horizontal)
@@ -31,7 +34,7 @@ class Ui_RobotTuning(object):
         self.LV_Slider.setMinimum(0)
         self.LV_Slider.setMaximum(100)
         self.LV_Slider.setValue(50)
-        self.LV_Slider.valueChanged.connect
+
         self.horizontalSlider_3 = QtWidgets.QSlider(self.centralwidget)
         self.horizontalSlider_3.setGeometry(QtCore.QRect(140, 140, 160, 16))
         self.horizontalSlider_3.setOrientation(QtCore.Qt.Horizontal)
@@ -48,21 +51,29 @@ class Ui_RobotTuning(object):
         self.horizontalSlider_6.setGeometry(QtCore.QRect(140, 260, 160, 16))
         self.horizontalSlider_6.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider_6.setObjectName("horizontalSlider_6")
+
         self.Reset = QtWidgets.QPushButton(self.centralwidget)
         self.Reset.setGeometry(QtCore.QRect(160, 330, 131, 51))
         self.Reset.setObjectName("Reset")
+
         self.Resume = QtWidgets.QPushButton(self.centralwidget)
         self.Resume.setGeometry(QtCore.QRect(300, 330, 131, 51))
         self.Resume.setObjectName("Resume")
+
         self.AV_Label = QtWidgets.QLabel(self.centralwidget)
         self.AV_Label.setGeometry(QtCore.QRect(20, 50, 121, 21))
         self.AV_Label.setObjectName("AV_Label")
+
         self.LV_Label = QtWidgets.QLabel(self.centralwidget)
         self.LV_Label.setGeometry(QtCore.QRect(20, 90, 111, 21))
         self.LV_Label.setObjectName("LV_Label")
+
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setGeometry(QtCore.QRect(310, 50, 41, 31))
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.setText("1")
+
+
         self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_2.setGeometry(QtCore.QRect(310, 90, 41, 31))
         self.lineEdit_2.setObjectName("lineEdit_2") 
@@ -78,6 +89,7 @@ class Ui_RobotTuning(object):
         self.lineEdit_6 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit_6.setGeometry(QtCore.QRect(310, 250, 41, 31))
         self.lineEdit_6.setObjectName("lineEdit_6")
+
         RobotTuning.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(RobotTuning)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 456, 22))
@@ -99,6 +111,8 @@ class Ui_RobotTuning(object):
         self.AV_Label.setText(_translate("RobotTuning", "Angular Velocity:"))
         self.LV_Label.setText(_translate("RobotTuning", "Linear Velocity:"))
 
+    def stopButtonPressed(self):
+        print("STOPPED")
 
 if __name__ == "__main__":
     import sys
