@@ -12,8 +12,8 @@
 #ifndef PATH_FOLLOWING_H
 #define PATH_FOLLOWING_H
 
-#define TURTLEBOT_LINEAR_SCALING 0.26
-#define TURTLEBOT_ANGULAR_SCALING 1.82
+#define TURTLEBOT_LINEAR_SCALING 0.06 // 0.26
+#define TURTLEBOT_ANGULAR_SCALING 0.20 // 1.82
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Twist.h"
@@ -88,9 +88,9 @@ class PathFollowing
     const double HYSTERESIS_LEVEL = 0.5;
     const double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
     const double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
-    const double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6;
+    const double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6.0;
     const double PURE_PURSUIT_THRESHOLD = M_PI_4;
-    const double ROBOT_RADIUS = 0.1;
+    const double ROBOT_RADIUS = 0.5;
     double hysteresis_factor_;
     TargetPose target_pose_;
 };

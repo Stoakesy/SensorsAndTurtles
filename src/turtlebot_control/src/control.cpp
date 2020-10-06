@@ -35,7 +35,7 @@ Control::~Control()
 void Control::poseCallback(const geometry_msgs::Pose & msg)
 {
   // Get the pose for the robot to drive to
-  ROS_INFO("New pose received");
+  // ROS_INFO("New pose received");
   geometry_msgs::Pose target_pose=msg;
   robot_control_.setTargetPose(target_pose);
 }
@@ -52,10 +52,15 @@ void Control::mainThread(void)
   {
     if (robot_control_.calculateVelocity(velocity, use_pure_pursuit_))
     {
+      std::cout << "Final linear velocity " << velocity.linear.x << " m/s" << std::endl;
+      std::cout << "Final angular velocity " << velocity.angular.z << " rad/s" << std::endl;
       velocity_pub_.publish(velocity);
       robot_stopped_ = false;
     }
-    
+    else
+    {
+      std::cout << "VELOCITY ERROR" << std::endl << std::endl;
+    }
     // This delay slows the loop down for the sake of readability
     std::this_thread::sleep_for (std::chrono::milliseconds(MAIN_THREAD_DELAY_MS));
   }
