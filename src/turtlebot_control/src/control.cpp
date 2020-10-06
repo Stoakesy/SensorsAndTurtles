@@ -22,7 +22,8 @@ Control::Control(ros::NodeHandle nh, bool use_pure_pursuit):
   use_pure_pursuit_(use_pure_pursuit)
 {
   // Initialise publishers and subscribers
-  path_sub_ = nh_.subscribe("target_pose", 10, &Control::poseCallback,this);
+  pose_sub_ = nh_.subscribe("target_pose", 10, &Control::poseCallback,this);
+  param_sub_ = nh_.subscribe("control_parameters", 10, &Control::paramCallback,this);
   velocity_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
   ros::NodeHandle pn("~");
 }
@@ -38,6 +39,14 @@ void Control::poseCallback(const geometry_msgs::Pose & msg)
   // ROS_INFO("New pose received");
   geometry_msgs::Pose target_pose=msg;
   robot_control_.setTargetPose(target_pose);
+}
+
+void Control::paramCallback(const std_msgs::String::ConstPtr & msg)
+{
+  // Get the pose for the robot to drive to
+  ROS_INFO("New parameters received");
+  const char* parameters=msg->data.c_str();
+  robot_control_.updateParameters(parameters);
 }
 
 void Control::mainThread(void)
