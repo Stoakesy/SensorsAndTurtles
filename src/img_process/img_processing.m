@@ -26,21 +26,28 @@ while (1)
     [id,loc,pose] = readAprilTag(img,"tag36h11",intrinsics,makerSize);
     
     %if no data send 0,0,0 as pose
-    poseCheck = isnan(pose.Translation);
-    pose.Translation(poseCheck) = 0;
+    if (isempty(pose))
+        %populate ros message
+        poseMsg.Position.X = 0;
+        poseMsg.Position.Y = 0;
+        poseMsg.Position.Z = 0;
 
-    rotCheck = isnan(pose.Rotation);
-    pose.Rotation(rotCheck) = 0;
-    
-    %populate ros message
-    poseMsg.Position.X = pose.Translation(1);
-    poseMsg.Position.Y = pose.Translation(2);
-    poseMsg.Position.Z = pose.Translation(3);
-    quat = rotm2quat(pose.Rotation);
-    poseMsg.Orientation.W = quat(1);
-    poseMsg.Orientation.X = quat(2);
-    poseMsg.Orientation.Y = quat(3);
-    poseMsg.Orientation.Z = quat(4);
+        poseMsg.Orientation.W = 0;
+        poseMsg.Orientation.X = 0;
+        poseMsg.Orientation.Y = 0;
+        poseMsg.Orientation.Z = 0;
+    else
+        %populate ros message
+        poseMsg.Position.X = pose.Translation(1);
+        poseMsg.Position.Y = pose.Translation(2);
+        poseMsg.Position.Z = pose.Translation(3);
+        quat = rotm2quat(pose.Rotation);
+        poseMsg.Orientation.W = quat(1);
+        poseMsg.Orientation.X = quat(2);
+        poseMsg.Orientation.Y = quat(3);
+        poseMsg.Orientation.Z = quat(4);
+    end
+        
     %publish ros message
     send(posePub, poseMsg);
     
