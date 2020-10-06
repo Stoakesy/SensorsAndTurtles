@@ -44,7 +44,6 @@ void Control::poseCallback(const geometry_msgs::Pose & msg)
 void Control::paramCallback(const std_msgs::String::ConstPtr & msg)
 {
   // Get the pose for the robot to drive to
-  ROS_INFO("New parameters received");
   std::string parameters = msg->data.c_str();
   robot_control_.updateParameters(parameters);
 }

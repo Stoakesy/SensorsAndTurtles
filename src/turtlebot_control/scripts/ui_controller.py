@@ -1,14 +1,16 @@
+#!/usr/bin/env python3
+
 import rospy
 from std_msgs.msg import String
 import sys
-from GUI2 import Ui_RobotTuning
+from control_gui import Ui_RobotTuning
 from PyQt5 import QtWidgets
 import threading
 
 isActive = True
 
 def initNode():
-    rospy.init_node('control_parameters_node', anonymous=True)
+    rospy.init_node('control_parameters', anonymous=True)
 
 def messagePublisherThread(ui):
     pub = rospy.Publisher('/control_parameters', String, queue_size=10)

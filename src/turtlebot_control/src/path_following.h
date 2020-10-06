@@ -110,6 +110,7 @@ class PathFollowing
     double ROBOT_RADIUS = 0.5;
     double IS_ACTIVE = 0;
     double hysteresis_factor_;
+    double previous_heading_ = 0;
     TargetPose target_pose_;
 };
 

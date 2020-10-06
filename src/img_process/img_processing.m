@@ -15,27 +15,37 @@ pause(2); %allow for connectionof publisher and subscriber
 %enable ros message
 poseMsg = rosmessage(posePub);
 
+check = 0;
+
 while (1)
     %recieve incoming ros message of camera image
     imgData = receive(rosImg, 5);
+    tic
     %convert from ros image format to Matlab image format
     img = readImage(imgData);
+    imgRead = toc;
     %apply camera intrinsics data to image
     img = undistortImage(img,intrinsics,"OutputView","same");
+    imgProcessed = toc;
     %read the image to find april tag
     [id,loc,pose] = readAprilTag(img,"tag36h11",intrinsics,makerSize);
+    tagFound = toc;
     
     %if no data send 0,0,0 as pose
     if (isempty(pose))
-        %populate ros message
-        poseMsg.Position.X = 0;
-        poseMsg.Position.Y = 0;
-        poseMsg.Position.Z = 0;
+        check = check + 1;
+        if (check >= 3)
+            check = 0;
+            %populate ros message
+            poseMsg.Position.X = 0;
+            poseMsg.Position.Y = 0;
+            poseMsg.Position.Z = 0;
 
-        poseMsg.Orientation.W = 0;
-        poseMsg.Orientation.X = 0;
-        poseMsg.Orientation.Y = 0;
-        poseMsg.Orientation.Z = 0;
+            poseMsg.Orientation.W = 0;
+            poseMsg.Orientation.X = 0;
+            poseMsg.Orientation.Y = 0;
+            poseMsg.Orientation.Z = 0;
+        end
     else
         %populate ros message
         poseMsg.Position.X = pose.Translation(1);
@@ -50,7 +60,11 @@ while (1)
         
     %publish ros message
     send(posePub, poseMsg);
+    msgSent = toc;
     
-    pause(0.5);
+    pause(0.01);
+    pauseDone = toc;
+    
+    hi=1;
     
  end

@@ -58,12 +58,12 @@ bool PathFollowing::updateParameters(std::string parameters)
 
   if (convertedValues.size() == EXPECTED_NUMBER_OF_PARAMETERS)
   {
-    ANGULAR_THRESHOLD_RATIO = convertedValues.at(0);
-    HYSTERESIS_LEVEL = convertedValues.at(1);
-    MAX_LINEAR_VELOCITY = convertedValues.at(2);
-    MAX_ANGULAR_VELOCITY_FAST = convertedValues.at(3);
-    MAX_ANGULAR_VELOCITY_SLOW = convertedValues.at(4);
-    PURE_PURSUIT_THRESHOLD = convertedValues.at(5);
+    MAX_LINEAR_VELOCITY = convertedValues.at(0);
+    MAX_ANGULAR_VELOCITY_FAST = convertedValues.at(1);
+    MAX_ANGULAR_VELOCITY_SLOW = MAX_ANGULAR_VELOCITY_FAST * convertedValues.at(2);
+    HYSTERESIS_LEVEL = convertedValues.at(3);
+    PURE_PURSUIT_THRESHOLD = convertedValues.at(4);
+    ANGULAR_THRESHOLD_RATIO = convertedValues.at(5);
     ROBOT_RADIUS = convertedValues.at(6);
     IS_ACTIVE = convertedValues.at(7);
     success = true;
@@ -103,10 +103,18 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   velocity.linear.x = 0;
   velocity.angular.z = 0;
 
+  // Check if zero position
+  double total_position = fabs(goal.position.x) + fabs(goal.position.y) + fabs(goal.position.z);
+
   // If close to goal, rotate to correct orientation
   bool within_z = (fabs(goal.position.z) < ROBOT_RADIUS);
   bool within_x = (fabs(goal.position.x) < ROBOT_RADIUS);
-  if (within_z && within_x)
+  if (total_position == 0)
+  {
+    desired_heading = previous_heading_;
+    std::cout << "Target not found." << std::endl;
+  }
+  else if (within_z && within_x)
   {
     desired_heading = goal.orientation.y;
     std::cout << "Target is close to goal. Rotating to target by " << (desired_heading * 180 / M_PI) << " degrees clockwise" << std::endl;
@@ -127,11 +135,12 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
     std::cout << "Robot turning CW" << std::endl;
     direction = CW;
   }
+  previous_heading_ = desired_heading;
 
   if (within_z && within_x)
   {
     velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_FAST;
-    std::cout << "Target is close to goal. Rotating at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
+    std::cout << "Rotating at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
     return success;
   }
   else
