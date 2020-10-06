@@ -30,12 +30,12 @@ bool PathFollowing::setTargetPose(geometry_msgs::Pose target_pose)
   return true;
 }
 
-bool PathFollowing::updateParameters(const char* parameters)
+bool PathFollowing::updateParameters(std::string parameters)
 {
   bool success = false;
-  std::list<std::string> values;
+  std::vector<std::string> values;
   std::string next_value = "";
-  for (unsigned int i = 0; i < strlen(parameters); ++i)
+  for (unsigned int i = 0; i < parameters.length(); ++i)
   {
     if (parameters[i] == ',')
     {
@@ -48,29 +48,24 @@ bool PathFollowing::updateParameters(const char* parameters)
     }
   }
   values.push_back(next_value);
-  std::list<double> convertedValues;
-    for(auto it = values.begin(); it != values.end(); ++it)
+  std::vector<double> convertedValues;
+    for(auto& it : values)
     {
-        std::string nextValue = values.front();
-        values.pop_front();
+        std::string nextValue = it;
         double result = std::stod(nextValue);
         convertedValues.push_back(result);
     }
 
   if (convertedValues.size() == EXPECTED_NUMBER_OF_PARAMETERS)
   {
-    ANGULAR_THRESHOLD_RATIO = convertedValues.front();
-    convertedValues.pop_front();
-    HYSTERESIS_LEVEL = convertedValues.front();
-    convertedValues.pop_front();
-    MAX_LINEAR_VELOCITY = convertedValues.front();
-    convertedValues.pop_front();
-    MAX_ANGULAR_VELOCITY_FAST = convertedValues.front();
-    convertedValues.pop_front();
-    MAX_ANGULAR_VELOCITY_SLOW = convertedValues.front();
-    convertedValues.pop_front();
-    PURE_PURSUIT_THRESHOLD = convertedValues.front();
-    convertedValues.pop_front();
+    ANGULAR_THRESHOLD_RATIO = convertedValues.at(0);
+    HYSTERESIS_LEVEL = convertedValues.at(1);
+    MAX_LINEAR_VELOCITY = convertedValues.at(2);
+    MAX_ANGULAR_VELOCITY_FAST = convertedValues.at(3);
+    MAX_ANGULAR_VELOCITY_SLOW = convertedValues.at(4);
+    PURE_PURSUIT_THRESHOLD = convertedValues.at(5);
+    ROBOT_RADIUS = convertedValues.at(6);
+    IS_ACTIVE = convertedValues.at(7);
     success = true;
   }
   return success;
@@ -89,6 +84,11 @@ bool PathFollowing::getZeroVelocity(geometry_msgs::Twist &velocity)
 
 bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit)
 {
+  if (!IS_ACTIVE)
+  {
+    getZeroVelocity(velocity);
+    return true;
+  }
   std::cout << "---------------------------------------------------" << std::endl;
   target_pose_.mtx.lock();
   geometry_msgs::Pose goal = target_pose_.pose;

@@ -37,7 +37,7 @@ void Control::poseCallback(const geometry_msgs::Pose & msg)
 {
   // Get the pose for the robot to drive to
   // ROS_INFO("New pose received");
-  geometry_msgs::Pose target_pose=msg;
+  geometry_msgs::Pose target_pose = msg;
   robot_control_.setTargetPose(target_pose);
 }
 
@@ -45,7 +45,7 @@ void Control::paramCallback(const std_msgs::String::ConstPtr & msg)
 {
   // Get the pose for the robot to drive to
   ROS_INFO("New parameters received");
-  const char* parameters=msg->data.c_str();
+  std::string parameters = msg->data.c_str();
   robot_control_.updateParameters(parameters);
 }
 
