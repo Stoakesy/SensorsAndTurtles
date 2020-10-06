@@ -16,7 +16,7 @@
 
 #include "control.h"
 
-Control::Control(ros::NodeHandle nh, bool use_pure_pursuit):
+Control::Control(ros::NodeHandle nh, bool use_pure_pursuit, bool use_p_controller):
   nh_(nh),
   robot_stopped_(true),
   use_pure_pursuit_(use_pure_pursuit)
