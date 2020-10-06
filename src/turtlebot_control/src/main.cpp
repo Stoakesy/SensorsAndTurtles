@@ -24,12 +24,15 @@ int main(int argc, char **argv)
   // Use Pure Pursuit
   bool use_pure_pursuit = true;
 
+  // Use Pure Pursuit
+  bool use_p_controller = true;
+
   // Initialise this ROS node
   ros::init(argc, argv, "path_following");
   ros::NodeHandle nh;
 
   // Start the threads contained in the control class
-  std::shared_ptr<Control> gc(new Control(nh, use_pure_pursuit));
+  std::shared_ptr<Control> gc(new Control(nh, use_pure_pursuit, use_p_controller));
   std::thread main_thread(&Control::mainThread,gc);
 
   // Handle callbacks

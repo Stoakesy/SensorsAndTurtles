@@ -97,7 +97,7 @@ class PathFollowing
      * 
      * @return true if the operation was successful
      */
-    bool calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit);
+    bool calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit, bool use_p_controller);
 
   private:
     const double EXPECTED_NUMBER_OF_PARAMETERS = 8;
@@ -106,7 +106,7 @@ class PathFollowing
     double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
     double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
     double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6.0;
-    double PURE_PURSUIT_THRESHOLD = M_PI_4;
+    double PURSUIT_THRESHOLD = M_PI_4;
     double ROBOT_RADIUS = 0.5;
     double IS_ACTIVE = 0;
     double hysteresis_factor_;

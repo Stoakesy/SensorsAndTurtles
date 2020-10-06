@@ -58,7 +58,7 @@ void Control::mainThread(void)
 
   while (ros::ok())
   {
-    if (robot_control_.calculateVelocity(velocity, use_pure_pursuit_))
+    if (robot_control_.calculateVelocity(velocity, use_pure_pursuit_, use_p_controller_))
     {
       std::cout << "Final linear velocity " << velocity.linear.x << " m/s" << std::endl;
       std::cout << "Final angular velocity " << velocity.angular.z << " rad/s" << std::endl;
