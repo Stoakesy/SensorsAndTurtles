@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 import sys
-from control_gui import Ui_RobotTuning
+from control_gui import RobotTuningUI
 from PyQt5 import QtWidgets
 import threading
 
@@ -19,10 +19,10 @@ def messagePublisherThread(ui):
     rate = rospy.Rate(10) # 10hz
     global isActive
     while not rospy.is_shutdown() and isActive:
-        dataString = ui.getParameters()
+        dataString = ui.get_parameters()
         rospy.loginfo(dataString)
         pub.publish(dataString)
-        if ui.isStopped():
+        if ui.is_stopped():
             stopPub.publish(getStopMessage())
         rate.sleep()
 
@@ -40,7 +40,7 @@ def main():
     initNode()
     app = QtWidgets.QApplication(sys.argv)
     RobotTuning = QtWidgets.QMainWindow()
-    ui = Ui_RobotTuning()
+    ui = RobotTuningUI()
     ui.setupUi(RobotTuning)    
     RobotTuning.show()
     rosThread = threading.Thread(target=messagePublisherThread, args=[ui])

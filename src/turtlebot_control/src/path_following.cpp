@@ -16,8 +16,7 @@
 
 #include "path_following.h"
 
-PathFollowing::PathFollowing():
-  hysteresis_factor_(0)
+PathFollowing::PathFollowing()
 {
   
 }
@@ -61,10 +60,8 @@ bool PathFollowing::updateParameters(std::string parameters)
     MAX_LINEAR_VELOCITY = convertedValues.at(0);
     MAX_ANGULAR_VELOCITY_FAST = convertedValues.at(1);
     MAX_ANGULAR_VELOCITY_SLOW = MAX_ANGULAR_VELOCITY_FAST * convertedValues.at(2);
-    HYSTERESIS_LEVEL = convertedValues.at(3);
-    PURSUIT_THRESHOLD = convertedValues.at(4) * (M_PI / 180.0);
-    ANGULAR_THRESHOLD_RATIO = convertedValues.at(5);
-    ROBOT_RADIUS = convertedValues.at(6);
+    PURSUIT_THRESHOLD = convertedValues.at(3) * (M_PI / 180.0);
+    STOPPING_DISTANCE = convertedValues.at(4);
     IS_ACTIVE = convertedValues.at(7);
     success = true;
   }
@@ -82,7 +79,7 @@ bool PathFollowing::getZeroVelocity(geometry_msgs::Twist &velocity)
   return true;
 }
 
-bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit, bool use_p_controller)
+bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity)
 {
   // ------------------- Get data -------------------
   // Initialise variables
@@ -109,8 +106,8 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   double total_position = fabs(goal.position.x) + fabs(goal.position.y) + fabs(goal.position.z);
 
   // Determine if close to goal
-  bool within_z = (fabs(goal.position.z) < ROBOT_RADIUS);
-  bool within_x = (fabs(goal.position.x) < ROBOT_RADIUS);
+  bool within_z = (fabs(goal.position.z) < STOPPING_DISTANCE);
+  bool within_x = (fabs(goal.position.x) < STOPPING_DISTANCE);
 
   // ------------------- Determine the desired heading -------------------
   // If goal not found, position is 0
@@ -155,68 +152,20 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity, bool use_p
   // If not close to target, drive with linear velocity
   else
   {
-    if (use_p_controller)
+    double angle_ratio = fabs(desired_heading) / PURSUIT_THRESHOLD;
+    // If within angle, use proportional controller
+    if (angle_ratio < 1.0)
     {
-      double angle_ratio = fabs(desired_heading) / PURSUIT_THRESHOLD;
-      // If within angle, use proportional controller
-      if (angle_ratio < 1.0)
-      {
-        velocity.linear.x = /*MAX_LINEAR_VELOCITY*/ 0.2 * (1.0 - angle_ratio);
-        velocity.angular.z = direction * 0.6 /*MAX_ANGULAR_VELOCITY_SLOW*/ * angle_ratio;
-        std::cout << "Target within threshold. Angular ratio of " << angle_ratio << std::endl << std::endl;
-      }
-      // If outside of angle, simply turn
-      else
-      {
-        velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_SLOW;
-        std::cout << "Target NOT within threshold. Turning slowly at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
-      }
+      velocity.linear.x = /*MAX_LINEAR_VELOCITY*/ 0.2 * (1.0 - angle_ratio);
+      velocity.angular.z = direction * 0.6 /*MAX_ANGULAR_VELOCITY_SLOW*/ * angle_ratio;
+      std::cout << "Target within threshold. Angular ratio of " << angle_ratio << std::endl << std::endl;
     }
+    // If outside of angle, simply turn
     else
     {
-      if (fabs(desired_heading) < (ANGULAR_THRESHOLD_RATIO * (1 + hysteresis_factor_)))
-      {
-        // Drive
-        velocity.linear.x = MAX_LINEAR_VELOCITY;
-        hysteresis_factor_ = HYSTERESIS_LEVEL;
-        std::cout << "Target within threshold. Driving at " << velocity.linear.x << " m/s" << std::endl;
-      }
-      else
-      {
-        hysteresis_factor_ = 0;
-        // Turn
-        velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_SLOW;
-        std::cout << "Target NOT within threshold. Turning slowly at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
-        return success;
-      }
+      velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_SLOW;
+      std::cout << "Target NOT within threshold. Turning slowly at " << velocity.angular.z << " rad/s" << std::endl << std::endl;
     }
-    
-  }
-
-  // Pure Pursuit
-  if (!use_p_controller)
-  {
-    if ((fabs(desired_heading) < PURSUIT_THRESHOLD) && use_pure_pursuit)
-    {
-      std::cout << "Undertaking Pure Pursuit" << std::endl;
-      double numerator = (
-        pow(goal.position.z, 2) +
-        pow(goal.position.x, 2)
-      );
-
-      double radius = numerator / (2 * (goal.position.x));
-
-      velocity.linear.x = MAX_LINEAR_VELOCITY;
-      velocity.angular.z = MAX_LINEAR_VELOCITY / radius;
-    }
-    else
-    {
-      std::cout << "No Pure Pursuit" << std::endl;
-    }
-  }
-  else
-  {
-    std::cout << "Using P controller strategy" << std::endl;
   }
   return success;
 }

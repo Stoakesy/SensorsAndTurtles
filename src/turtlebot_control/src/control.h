@@ -44,10 +44,8 @@ class Control
      * @brief Constructor for Control class
      * 
      * @param nh ROS node handler
-     * @param use_pure_pursuit Flag indicating if pure pursuit should be used or not
-     * @param use_p_controller Flag indicating if the P controller should be used or not (this will override pure pursuit)
     */
-    Control(ros::NodeHandle nh, bool use_pure_pursuit, bool use_p_controller);
+    Control(ros::NodeHandle nh);
 
     /**
      * @brief Destructor for Control class
@@ -76,16 +74,11 @@ class Control
   private:
     ros::NodeHandle nh_;
     
-    ros::Subscriber odom_sub_;
     ros::Subscriber pose_sub_;
     ros::Subscriber param_sub_;
     ros::Publisher velocity_pub_;
 
     PathFollowing robot_control_;
-    
-    bool robot_stopped_;
-    bool use_pure_pursuit_;
-    bool use_p_controller_;
 };
 
 #endif // CONTROL_H

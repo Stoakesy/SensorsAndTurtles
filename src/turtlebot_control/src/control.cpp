@@ -16,11 +16,8 @@
 
 #include "control.h"
 
-Control::Control(ros::NodeHandle nh, bool use_pure_pursuit, bool use_p_controller):
-  nh_(nh),
-  robot_stopped_(true),
-  use_pure_pursuit_(use_pure_pursuit),
-  use_p_controller_(use_p_controller)
+Control::Control(ros::NodeHandle nh):
+  nh_(nh)
 {
   // Initialise publishers and subscribers
   pose_sub_ = nh_.subscribe("target_pose", 10, &Control::poseCallback,this);
@@ -59,12 +56,11 @@ void Control::mainThread(void)
 
   while (ros::ok())
   {
-    if (robot_control_.calculateVelocity(velocity, use_pure_pursuit_, use_p_controller_))
+    if (robot_control_.calculateVelocity(velocity))
     {
       std::cout << "Final linear velocity " << velocity.linear.x << " m/s" << std::endl;
       std::cout << "Final angular velocity " << velocity.angular.z << " rad/s" << std::endl;
       velocity_pub_.publish(velocity);
-      robot_stopped_ = false;
     }
     else
     {

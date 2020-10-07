@@ -12,8 +12,8 @@
 #ifndef PATH_FOLLOWING_H
 #define PATH_FOLLOWING_H
 
-#define TURTLEBOT_LINEAR_SCALING 0.06 // 0.26
-#define TURTLEBOT_ANGULAR_SCALING 0.20 // 1.82
+#define TURTLEBOT_LINEAR_SCALING 0.26
+#define TURTLEBOT_ANGULAR_SCALING 1.82
 
 #include "geometry_msgs/Pose.h"
 #include "geometry_msgs/Twist.h"
@@ -69,12 +69,14 @@ class PathFollowing
      * @brief Updates the parameters for the robot control
      * 
      * @param parameters CSV list of parameters in the following order:
-     *  - Angular Threshold Ratio
-     *  - Hysteresis Level
-     *  - Maximum linear velocity
-     *  - Maximum angular velocity (fast)
-     *  - Maximum angular velocity (slow)
-     *  - Pure pursuit angular threshold
+     *  1. Maximum linear velocity
+     *  2. Maximum angular velocity
+     *  3. Angular velocity scaling factor (slow)
+     *  4. Pursuit angle threshold (in degrees)
+     *  5. Distance to stop before robot
+     *  6. Reserved A
+     *  7. Reserved B
+     *  8. Flag (0 or 1) if system is active
      * 
      * @return true if the operation was successful
      */
@@ -93,23 +95,19 @@ class PathFollowing
      * @brief Returns the required velocity of the robot to reach a given pose
      * 
      * @param velocity Reference to the required velocity of the robot to reach the next pose
-     * @param use_pure_pursuit flag to indicate if pure pursuit should be used
      * 
      * @return true if the operation was successful
      */
-    bool calculateVelocity(geometry_msgs::Twist &velocity, bool use_pure_pursuit, bool use_p_controller);
+    bool calculateVelocity(geometry_msgs::Twist &velocity);
 
   private:
     const double EXPECTED_NUMBER_OF_PARAMETERS = 8;
-    double ANGULAR_THRESHOLD_RATIO = 0.05;
-    double HYSTERESIS_LEVEL = 0.5;
     double MAX_LINEAR_VELOCITY = TURTLEBOT_LINEAR_SCALING;
     double MAX_ANGULAR_VELOCITY_FAST = TURTLEBOT_ANGULAR_SCALING;
     double MAX_ANGULAR_VELOCITY_SLOW = TURTLEBOT_ANGULAR_SCALING / 6.0;
     double PURSUIT_THRESHOLD = M_PI_4;
-    double ROBOT_RADIUS = 0.5;
+    double STOPPING_DISTANCE = 0.5;
     double IS_ACTIVE = 0;
-    double hysteresis_factor_;
     double previous_heading_ = 0;
     TargetPose target_pose_;
 };

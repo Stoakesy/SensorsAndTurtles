@@ -10,21 +10,21 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 max_linear_velocity = 0.26
 max_angular_velocity = 1.82
-max_slowTurnMultiplier = 1
-max_hysteresis = 1
-max_purePursuit = 90
-max_angular = 0.5
-max_goalDistance  = 0.5
+max_slow_turn_multiplier = 1
+max_pursuit_angle = 90
+max_stop_distance  = 0.5
+max_reserved_a = 1
+max_reserved_b = 1
 
 default_linear_velocity = 0.13
 default_angular_velocity = 0.91
-default_slowTurnMultiplier = 0.2
-default_hysteresis = 0.5
-default_purePursuit = 45
-default_angular = 0.05
-default_goalDistance = 0.25
+default_slow_turn_multiplier = 0.2
+default_pursuit_angle = 45
+default_stop_distance = 0.25
+default_reserved_a = 0.5
+default_reserved_b = 0.5
 
-class Ui_RobotTuning(object):
+class RobotTuningUI(object):
     def setupUi(self, RobotTuning):
         RobotTuning.setObjectName("RobotTuning")
         RobotTuning.resize(453, 472)
@@ -32,145 +32,143 @@ class Ui_RobotTuning(object):
         self.centralwidget.setObjectName("centralwidget")
 
         ##################### BUTTONS #####################
-        self.Stop = QtWidgets.QPushButton(self.centralwidget)
-        self.Stop.setGeometry(QtCore.QRect(20, 360, 131, 51))
-        self.Stop.setObjectName("Stop")
-        self.Stop.clicked.connect(self.stopPressed)
+        self.btn_stop = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_stop.setGeometry(QtCore.QRect(20, 360, 131, 51))
+        self.btn_stop.setObjectName("btn_stop")
+        self.btn_stop.clicked.connect(self.stop_pressed)
 
-        self.Reset = QtWidgets.QPushButton(self.centralwidget)
-        self.Reset.setGeometry(QtCore.QRect(160, 360, 131, 51))
-        self.Reset.setObjectName("Reset")
-        self.Reset.clicked.connect(self.resetPressed)
+        self.btn_reset = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_reset.setGeometry(QtCore.QRect(160, 360, 131, 51))
+        self.btn_reset.setObjectName("btn_reset")
+        self.btn_reset.clicked.connect(self.reset_pressed)
 
-        self.Resume = QtWidgets.QPushButton(self.centralwidget)
-        self.Resume.setGeometry(QtCore.QRect(300, 360, 131, 51))
-        self.Resume.setObjectName("Resume")
-        self.Resume.clicked.connect(self.resumePressed)
+        self.btn_resume = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_resume.setGeometry(QtCore.QRect(300, 360, 131, 51))
+        self.btn_resume.setObjectName("btn_resume")
+        self.btn_resume.clicked.connect(self.resume_pressed)
 
         ##################### INITIAL VALUES #####################
         self.linear_velocity = default_linear_velocity
         self.angular_velocity = default_angular_velocity
-        self.slowTurnMultiplier = default_slowTurnMultiplier
-        self.hysteresis = default_hysteresis
-        self.purePursuit = default_purePursuit
-        self.angular = default_angular
-        self.goalDistance = default_goalDistance
-        self.isActive = 1.0
+        self.slow_turn_multiplier = default_slow_turn_multiplier
+        self.pursuit_angle = default_pursuit_angle
+        self.stop_distance = default_stop_distance
+        self.reserved_a = default_reserved_a
+        self.reserved_b = default_reserved_b
+        self.is_active = 1.0
 
         ##################### VARIABLES #####################
         # Linear Velocity
-        self.LV_Label = QtWidgets.QLabel(self.centralwidget)
-        self.LV_Label.setGeometry(QtCore.QRect(20, 40, 111, 21))
-        self.LV_Label.setObjectName("LV_Label")
+        self.lbl_linear_velocity = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_linear_velocity.setGeometry(QtCore.QRect(20, 40, 111, 21))
+        self.lbl_linear_velocity.setObjectName("lbl_linear_velocity")
 
-        self.LVSlider = QtWidgets.QSlider(self.centralwidget)
-        self.LVSlider.setGeometry(QtCore.QRect(170, 50, 160, 16))
-        self.LVSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.LVSlider.setObjectName("LVSlider")
-        self.LVSlider.valueChanged.connect(self.lvChanged)
+        self.sld_linear_velocity = QtWidgets.QSlider(self.centralwidget)
+        self.sld_linear_velocity.setGeometry(QtCore.QRect(170, 50, 160, 16))
+        self.sld_linear_velocity.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_linear_velocity.setObjectName("sld_linear_velocity")
+        self.sld_linear_velocity.valueChanged.connect(self.linear_velocity_slider_changed)
 
-        self.LinVel = QtWidgets.QLineEdit(self.centralwidget)
-        self.LinVel.setGeometry(QtCore.QRect(340, 40, 91, 31))
-        self.LinVel.setObjectName("LinVel")
-        self.LinVel.returnPressed.connect(self.lvTextChanged)
+        self.txt_linear_velocity = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_linear_velocity.setGeometry(QtCore.QRect(340, 40, 91, 31))
+        self.txt_linear_velocity.setObjectName("txt_linear_velocity")
+        self.txt_linear_velocity.returnPressed.connect(self.linear_velocity_text_changed)
 
         # Angular Velocity
-        self.AV_Label = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label.setGeometry(QtCore.QRect(20, 80, 121, 21))
-        self.AV_Label.setObjectName("AV_Label")
+        self.lbl_angular_velocity = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_angular_velocity.setGeometry(QtCore.QRect(20, 80, 121, 21))
+        self.lbl_angular_velocity.setObjectName("lbl_angular_velocity")
 
-        self.AVSlider = QtWidgets.QSlider(self.centralwidget)
-        self.AVSlider.setGeometry(QtCore.QRect(170, 90, 160, 16))
-        self.AVSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.AVSlider.setObjectName("AVSlider")
-        self.AVSlider.valueChanged.connect(self.avChanged)
+        self.sld_angular_velocity = QtWidgets.QSlider(self.centralwidget)
+        self.sld_angular_velocity.setGeometry(QtCore.QRect(170, 90, 160, 16))
+        self.sld_angular_velocity.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_angular_velocity.setObjectName("sld_angular_velocity")
+        self.sld_angular_velocity.valueChanged.connect(self.angular_velocity_slider_changed)
 
-        self.AngVel = QtWidgets.QLineEdit(self.centralwidget)
-        self.AngVel.setGeometry(QtCore.QRect(340, 80, 91, 31))
-        self.AngVel.setObjectName("AngVel")
-        self.AngVel.returnPressed.connect(self.avTextChanged)
+        self.txt_angular_velocity = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_angular_velocity.setGeometry(QtCore.QRect(340, 80, 91, 31))
+        self.txt_angular_velocity.setObjectName("txt_angular_velocity")
+        self.txt_angular_velocity.returnPressed.connect(self.angular_velocity_text_changed)
 
         # Slow Turn Multiplier
-        self.AV_Label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label_2.setGeometry(QtCore.QRect(20, 120, 141, 21))
-        self.AV_Label_2.setObjectName("AV_Label_2")
+        self.lbl_slow_turn_multiplier = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_slow_turn_multiplier.setGeometry(QtCore.QRect(20, 120, 141, 21))
+        self.lbl_slow_turn_multiplier.setObjectName("lbl_slow_turn_multiplier")
 
-        self.SlowTurnSlider = QtWidgets.QSlider(self.centralwidget)
-        self.SlowTurnSlider.setGeometry(QtCore.QRect(170, 130, 160, 16))
-        self.SlowTurnSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.SlowTurnSlider.setObjectName("SlowTurnSlider")
-        self.SlowTurnSlider.valueChanged.connect(self.slowTurnChanged)
+        self.sld_slow_turn_multiplier = QtWidgets.QSlider(self.centralwidget)
+        self.sld_slow_turn_multiplier.setGeometry(QtCore.QRect(170, 130, 160, 16))
+        self.sld_slow_turn_multiplier.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_slow_turn_multiplier.setObjectName("sld_slow_turn_multiplier")
+        self.sld_slow_turn_multiplier.valueChanged.connect(self.slow_turn_multiplier_slider_changed)
 
-        self.SlowTurn = QtWidgets.QLineEdit(self.centralwidget)
-        self.SlowTurn.setGeometry(QtCore.QRect(340, 120, 91, 31))
-        self.SlowTurn.setObjectName("SlowTurn")
-        self.SlowTurn.returnPressed.connect(self.slowTurnTextChanged)
+        self.txt_slow_turn_multiplier = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_slow_turn_multiplier.setGeometry(QtCore.QRect(340, 120, 91, 31))
+        self.txt_slow_turn_multiplier.setObjectName("txt_slow_turn_multiplier")
+        self.txt_slow_turn_multiplier.returnPressed.connect(self.slow_turn_multiplier_text_changed)
 
-        #Hysterisis
-        self.AV_Label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label_3.setGeometry(QtCore.QRect(20, 160, 121, 21))
-        self.AV_Label_3.setObjectName("AV_Label_3")
+        # Pursuit Angle Threshold
+        self.lbl_pursuit_angle = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_pursuit_angle.setGeometry(QtCore.QRect(20, 160, 121, 21))
+        self.lbl_pursuit_angle.setObjectName("lbl_pursuit_angle")
 
-        self.HysterisisSlider = QtWidgets.QSlider(self.centralwidget)
-        self.HysterisisSlider.setGeometry(QtCore.QRect(170, 170, 160, 16))
-        self.HysterisisSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.HysterisisSlider.setObjectName("HysterisisSlider")
-        self.HysterisisSlider.valueChanged.connect(self.hysterisisChanged)
+        self.sld_pursuit_angle = QtWidgets.QSlider(self.centralwidget)
+        self.sld_pursuit_angle.setGeometry(QtCore.QRect(170, 170, 160, 16))
+        self.sld_pursuit_angle.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_pursuit_angle.setObjectName("sld_pursuit_angle")
+        self.sld_pursuit_angle.valueChanged.connect(self.pursuit_angle_slider_changed)
 
-        self.Hysterisis = QtWidgets.QLineEdit(self.centralwidget)
-        self.Hysterisis.setGeometry(QtCore.QRect(340, 160, 91, 31))
-        self.Hysterisis.setObjectName("Hysterisis")
-        self.Hysterisis.returnPressed.connect(self.hysterisisTextChanged)
+        self.txt_pursuit_angle = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_pursuit_angle.setGeometry(QtCore.QRect(340, 160, 91, 31))
+        self.txt_pursuit_angle.setObjectName("txt_pursuit_angle")
+        self.txt_pursuit_angle.returnPressed.connect(self.pursuit_angle_text_changed)
 
-        #Pure Pursuit
-        self.AV_Label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label_4.setGeometry(QtCore.QRect(20, 200, 121, 21))
-        self.AV_Label_4.setObjectName("AV_Label_4")
+        # Stopping Distance
+        self.lbl_stop_distance = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_stop_distance.setGeometry(QtCore.QRect(20, 200, 121, 21))
+        self.lbl_stop_distance.setObjectName("lbl_stop_distance")
 
-        self.PurePursuitSlider = QtWidgets.QSlider(self.centralwidget)
-        self.PurePursuitSlider.setGeometry(QtCore.QRect(170, 210, 160, 16))
-        self.PurePursuitSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.PurePursuitSlider.setObjectName("PurePursuitSlider")
-        self.PurePursuitSlider.valueChanged.connect(self.purePursuitChanged)
+        self.sld_stop_distance = QtWidgets.QSlider(self.centralwidget)
+        self.sld_stop_distance.setGeometry(QtCore.QRect(170, 210, 160, 16))
+        self.sld_stop_distance.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_stop_distance.setObjectName("sld_stop_distance")
+        self.sld_stop_distance.valueChanged.connect(self.stop_distance_slider_changed)
 
-        self.PurePursuit = QtWidgets.QLineEdit(self.centralwidget)
-        self.PurePursuit.setGeometry(QtCore.QRect(340, 200, 91, 31))
-        self.PurePursuit.setObjectName("PurePursuit")
-        self.PurePursuit.returnPressed.connect(self.purePursuitTextChanged)
+        self.txt_stop_distance = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_stop_distance.setGeometry(QtCore.QRect(340, 200, 91, 31))
+        self.txt_stop_distance.setObjectName("txt_stop_distance")
+        self.txt_stop_distance.returnPressed.connect(self.stop_distance_text_changed)
 
-        #Angular Threshold
-        self.AV_Label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label_5.setGeometry(QtCore.QRect(20, 240, 141, 21))
-        self.AV_Label_5.setObjectName("AV_Label_5")
+        # Reserved A
+        self.lbl_reserved_a = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_reserved_a.setGeometry(QtCore.QRect(20, 240, 141, 21))
+        self.lbl_reserved_a.setObjectName("lbl_reserved_a")
 
-        self.AngularThresholdSlider = QtWidgets.QSlider(self.centralwidget)
-        self.AngularThresholdSlider.setGeometry(QtCore.QRect(170, 250, 160, 16))
-        self.AngularThresholdSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.AngularThresholdSlider.setObjectName("AngularThresholdSlider")
-        self.AngularThresholdSlider.valueChanged.connect(self.angularChanged)
+        self.sld_reserved_a = QtWidgets.QSlider(self.centralwidget)
+        self.sld_reserved_a.setGeometry(QtCore.QRect(170, 250, 160, 16))
+        self.sld_reserved_a.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_reserved_a.setObjectName("sld_reserved_a")
+        self.sld_reserved_a.valueChanged.connect(self.reserved_a_slider_changed)
 
-        self.AngularThreshold = QtWidgets.QLineEdit(self.centralwidget)
-        self.AngularThreshold.setGeometry(QtCore.QRect(340, 240, 91, 31))
-        self.AngularThreshold.setObjectName("AngularThreshold")
-        self.AngularThreshold.returnPressed.connect(self.angularTextChanged)
+        self.txt_reserved_a = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_reserved_a.setGeometry(QtCore.QRect(340, 240, 91, 31))
+        self.txt_reserved_a.setObjectName("txt_reserved_a")
+        self.txt_reserved_a.returnPressed.connect(self.reserved_a_text_changed)
 
-        #Goal Distance
-        self.AV_Label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.AV_Label_6.setGeometry(QtCore.QRect(20, 280, 121, 21))
-        self.AV_Label_6.setObjectName("AV_Label_6")
+        # Reserved B
+        self.lbl_reserved_b = QtWidgets.QLabel(self.centralwidget)
+        self.lbl_reserved_b.setGeometry(QtCore.QRect(20, 280, 121, 21))
+        self.lbl_reserved_b.setObjectName("lbl_reserved_b")
 
-        self.GoalDistanceSlider = QtWidgets.QSlider(self.centralwidget)
-        self.GoalDistanceSlider.setGeometry(QtCore.QRect(170, 290, 160, 16))
-        self.GoalDistanceSlider.setOrientation(QtCore.Qt.Horizontal)
-        self.GoalDistanceSlider.setObjectName("GoalDistanceSlider")
-        self.GoalDistanceSlider.valueChanged.connect(self.goalDistChanged)
+        self.sld_reserved_b = QtWidgets.QSlider(self.centralwidget)
+        self.sld_reserved_b.setGeometry(QtCore.QRect(170, 290, 160, 16))
+        self.sld_reserved_b.setOrientation(QtCore.Qt.Horizontal)
+        self.sld_reserved_b.setObjectName("sld_reserved_b")
+        self.sld_reserved_b.valueChanged.connect(self.reserved_b_slider_changed)
 
-        self.GoalDistance = QtWidgets.QLineEdit(self.centralwidget)
-        self.GoalDistance.setGeometry(QtCore.QRect(340, 280, 91, 31))
-        self.GoalDistance.setObjectName("GoalDistance")
-        self.GoalDistance.returnPressed.connect(self.goalDistTextChanged)
-
-        
+        self.txt_reserved_b = QtWidgets.QLineEdit(self.centralwidget)
+        self.txt_reserved_b.setGeometry(QtCore.QRect(340, 280, 91, 31))
+        self.txt_reserved_b.setObjectName("txt_reserved_b")
+        self.txt_reserved_b.returnPressed.connect(self.reserved_b_text_changed)
 
         #############################################
 
@@ -185,137 +183,129 @@ class Ui_RobotTuning(object):
 
         self.retranslateUi(RobotTuning)
         QtCore.QMetaObject.connectSlotsByName(RobotTuning)
-        self.resetPressed()
+        self.reset_pressed()
 
         ##################### FUNCTIONS #####################
 
     def retranslateUi(self, RobotTuning):
         _translate = QtCore.QCoreApplication.translate
         RobotTuning.setWindowTitle(_translate("RobotTuning", "Robot Control"))
-        self.Stop.setText(_translate("RobotTuning", "Stop"))
-        self.Reset.setText(_translate("RobotTuning", "Reset"))
-        self.Resume.setText(_translate("RobotTuning", "Resume"))
-        self.AV_Label.setText(_translate("RobotTuning", "Angular Velocity:"))
-        self.LV_Label.setText(_translate("RobotTuning", "Linear Velocity:"))
-        # self.LinVel.setText(_translate("RobotTuning", f"{default_linear_velocity}"))
-        # self.AngVel.setText(_translate("RobotTuning", f"{default_angular_velocity}"))
-        # self.SlowTurn.setText(_translate("RobotTuning", f"{default_slowTurnMultiplier}"))
-        # self.Hysterisis.setText(_translate("RobotTuning", f"{default_hysteresis}"))
-        # self.PurePursuit.setText(_translate("RobotTuning", f"{default_purePursuit}"))
-        # self.AngularThreshold.setText(_translate("RobotTuning", f"{default_angular}"))
-        # self.GoalDistance.setText(_translate("RobotTuning", f"{default_goalDistance}"))
-        self.AV_Label_2.setText(_translate("RobotTuning", "Slow Turn Multiplier:"))
-        self.AV_Label_3.setText(_translate("RobotTuning", "Hysterisis:"))
-        self.AV_Label_4.setText(_translate("RobotTuning", "Pure Pursuit:"))
-        self.AV_Label_5.setText(_translate("RobotTuning", "Angular Threshold:"))
-        self.AV_Label_6.setText(_translate("RobotTuning", "Goal Distance:"))
+        self.btn_stop.setText(_translate("RobotTuning", "Stop"))
+        self.btn_reset.setText(_translate("RobotTuning", "Reset"))
+        self.btn_resume.setText(_translate("RobotTuning", "Resume"))
+        self.lbl_linear_velocity.setText(_translate("RobotTuning", "Linear Velocity:"))
+        self.lbl_angular_velocity.setText(_translate("RobotTuning", "Angular Velocity:"))
+        self.lbl_slow_turn_multiplier.setText(_translate("RobotTuning", "Slow Turn Multiplier:"))
+        self.lbl_pursuit_angle.setText(_translate("RobotTuning", "Pursuit Angle:"))
+        self.lbl_stop_distance.setText(_translate("RobotTuning", "Stop Distance:"))
+        self.lbl_reserved_a.setText(_translate("RobotTuning", "RESERVED"))
+        self.lbl_reserved_b.setText(_translate("RobotTuning", "RESERVED"))
 
-    def resetPressed(self):
-        self.LinVel.setText(f"{default_linear_velocity}")
-        self.AngVel.setText(f"{default_angular_velocity}")
-        self.SlowTurn.setText(f"{default_slowTurnMultiplier}")
-        self.Hysterisis.setText(f"{default_hysteresis}")
-        self.PurePursuit.setText(f"{default_purePursuit}")
-        self.AngularThreshold.setText(f"{default_angular}")
-        self.GoalDistance.setText(f"{default_goalDistance}")
+    def reset_pressed(self):
+        self.txt_linear_velocity.setText(f"{default_linear_velocity}")
+        self.txt_angular_velocity.setText(f"{default_angular_velocity}")
+        self.txt_slow_turn_multiplier.setText(f"{default_slow_turn_multiplier}")
+        self.txt_pursuit_angle.setText(f"{default_pursuit_angle}")
+        self.txt_stop_distance.setText(f"{default_stop_distance}")
+        self.txt_reserved_a.setText(f"{default_reserved_a}")
+        self.txt_reserved_b.setText(f"{default_reserved_b}")
 
-        self.lvTextChanged()
-        self.avTextChanged()
-        self.slowTurnTextChanged()
-        self.hysterisisTextChanged()
-        self.purePursuitTextChanged()
-        self.angularTextChanged()
-        self.goalDistTextChanged()
+        self.linear_velocity_text_changed()
+        self.angular_velocity_text_changed()
+        self.slow_turn_multiplier_text_changed()
+        self.pursuit_angle_text_changed()
+        self.stop_distance_text_changed()
+        self.reserved_a_text_changed()
+        self.reserved_b_text_changed()
 
-    def stopPressed(self):
+    def stop_pressed(self):
         print("Stopped pressed")
-        self.isActive = 0.0
+        self.is_active = 0.0
 
-    def resumePressed(self):
+    def resume_pressed(self):
         print("Resume pressed")
-        self.isActive = 1.0
+        self.is_active = 1.0
 
-    def mapValue(self, sliderValue, maxValue):
-        return maxValue * (sliderValue / 100.0)
+    def map_value(self, slider_value, max_value):
+        return max_value * (slider_value / 100.0)
     
-    def mapToSlider(self, valueText, maxValue):
+    def map_to_slider(self, value_text, max_value):
         try:
-            valueFloat = float(valueText)
+            value_float = float(value_text)
         except ValueError:
             return False
-        return valueFloat * (100.0 / maxValue)
+        return value_float * (100.0 / max_value)
     
     #############SLIDER2BOX####################
-    def updateBox(self, box, slider, max_value):
-        value = self.mapValue(slider.value(), max_value)
+    def update_box(self, box, slider, max_value):
+        value = self.map_value(slider.value(), max_value)
         box.setText("{:.2f}".format(value))
         return value
 
-    def lvChanged(self):
-        self.linear_velocity = self.updateBox(self.LinVel, self.LVSlider, max_linear_velocity)
+    def linear_velocity_slider_changed(self):
+        self.linear_velocity = self.update_box(self.txt_linear_velocity, self.sld_linear_velocity, max_linear_velocity)
         
-    def avChanged(self):
-        self.angular_velocity = self.updateBox(self.AngVel, self.AVSlider, max_angular_velocity)
+    def angular_velocity_slider_changed(self):
+        self.angular_velocity = self.update_box(self.txt_angular_velocity, self.sld_angular_velocity, max_angular_velocity)
 
-    def slowTurnChanged(self):
-        self.slowTurnMultiplier = self.updateBox(self.SlowTurn, self.SlowTurnSlider, max_slowTurnMultiplier)
+    def slow_turn_multiplier_slider_changed(self):
+        self.slow_turn_multiplier = self.update_box(self.txt_slow_turn_multiplier, self.sld_slow_turn_multiplier, max_slow_turn_multiplier)
 
-    def hysterisisChanged(self):
-        self.hysteresis = self.updateBox(self.Hysterisis, self.HysterisisSlider, max_hysteresis)
+    def pursuit_angle_slider_changed(self):
+        self.pursuit_angle = self.update_box(self.txt_pursuit_angle, self.sld_pursuit_angle, max_pursuit_angle)
 
-    def purePursuitChanged(self):
-        self.purePursuit = self.updateBox(self.PurePursuit, self.PurePursuitSlider, max_purePursuit)
+    def stop_distance_slider_changed(self):
+        self.stop_distance = self.update_box(self.txt_stop_distance, self.sld_stop_distance, max_stop_distance)
 
-    def angularChanged(self):
-        self.angular = self.updateBox(self.AngularThreshold, self.AngularThresholdSlider, max_angular)
+    def reserved_a_slider_changed(self):
+        self.reserved_a = self.update_box(self.txt_reserved_a, self.sld_reserved_a, max_reserved_a)
 
-    def goalDistChanged(self):
-        self.goalDistance = self.updateBox(self.GoalDistance, self.GoalDistanceSlider, max_goalDistance)
+    def reserved_b_slider_changed(self):
+        self.reserved_b = self.update_box(self.txt_reserved_b, self.sld_reserved_b, max_reserved_b)
 
     #############BOX2SLIDER####################
 
-    def lvTextChanged(self):
-        self.LVSlider.setValue(self.mapToSlider(self.LinVel.text(), max_linear_velocity))
+    def linear_velocity_text_changed(self):
+        self.sld_linear_velocity.setValue(self.map_to_slider(self.txt_linear_velocity.text(), max_linear_velocity))
 
-    def avTextChanged(self):
-        self.AVSlider.setValue(self.mapToSlider(self.AngVel.text(), max_angular_velocity))
+    def angular_velocity_text_changed(self):
+        self.sld_angular_velocity.setValue(self.map_to_slider(self.txt_angular_velocity.text(), max_angular_velocity))
 
-    def slowTurnTextChanged(self):
-        self.SlowTurnSlider.setValue(self.mapToSlider(self.SlowTurn.text(), max_slowTurnMultiplier))
+    def slow_turn_multiplier_text_changed(self):
+        self.sld_slow_turn_multiplier.setValue(self.map_to_slider(self.txt_slow_turn_multiplier.text(), max_slow_turn_multiplier))
 
-    def hysterisisTextChanged(self):
-        self.HysterisisSlider.setValue(self.mapToSlider(self.Hysterisis.text(), max_hysteresis))
+    def pursuit_angle_text_changed(self):
+        self.sld_pursuit_angle.setValue(self.map_to_slider(self.txt_pursuit_angle.text(), max_pursuit_angle))
 
-    def purePursuitTextChanged(self):
-        self.PurePursuitSlider.setValue(self.mapToSlider(self.PurePursuit.text(), max_purePursuit))
+    def stop_distance_text_changed(self):
+        self.sld_stop_distance.setValue(self.map_to_slider(self.txt_stop_distance.text(), max_stop_distance))
 
-    def angularTextChanged(self):
-        self.AngularThresholdSlider.setValue(self.mapToSlider(self.AngularThreshold.text(), max_angular))
+    def reserved_a_text_changed(self):
+        self.sld_reserved_a.setValue(self.map_to_slider(self.txt_reserved_a.text(), max_reserved_a))
 
-    def goalDistTextChanged(self):
-        self.GoalDistanceSlider.setValue(self.mapToSlider(self.GoalDistance.text(), max_goalDistance))
+    def reserved_b_text_changed(self):
+        self.sld_reserved_b.setValue(self.map_to_slider(self.txt_reserved_b.text(), max_reserved_b))
     
-    def isStopped(self):
-        return not self.isActive
+    def is_stopped(self):
+        return not self.is_active
 
-    def getParameters(self):
+    def get_parameters(self):
         return "{0:.4f},{1:.4f},{2:.4f},{3:.4f},{4:.4f},{5:.4f},{6:.4f},{7:.4f}".format(
             self.linear_velocity,
             self.angular_velocity,
-            self.slowTurnMultiplier,
-            self.hysteresis,
-            self.purePursuit,
-            self.angular,
-            self.goalDistance,
-            self.isActive
+            self.slow_turn_multiplier,
+            self.pursuit_angle,
+            self.stop_distance,
+            self.reserved_a,
+            self.reserved_b,
+            self.is_active
         )
     
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    RobotTuning = QtWidgets.QMainWindow()
-    ui = Ui_RobotTuning()
-    ui.setupUi(RobotTuning)
-    RobotTuning.show()
+    robot_tuning = QtWidgets.QMainWindow()
+    ui = RobotTuningUI()
+    ui.setupUi(robot_tuning)
+    robot_tuning.show()
     sys.exit(app.exec_())
-
