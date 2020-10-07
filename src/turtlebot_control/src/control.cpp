@@ -19,7 +19,8 @@
 Control::Control(ros::NodeHandle nh, bool use_pure_pursuit, bool use_p_controller):
   nh_(nh),
   robot_stopped_(true),
-  use_pure_pursuit_(use_pure_pursuit)
+  use_pure_pursuit_(use_pure_pursuit),
+  use_p_controller_(use_p_controller)
 {
   // Initialise publishers and subscribers
   pose_sub_ = nh_.subscribe("target_pose", 10, &Control::poseCallback,this);

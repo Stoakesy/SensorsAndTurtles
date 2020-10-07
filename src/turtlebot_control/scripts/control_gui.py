@@ -294,6 +294,9 @@ class Ui_RobotTuning(object):
 
     def goalDistTextChanged(self):
         self.GoalDistanceSlider.setValue(self.mapToSlider(self.GoalDistance.text(), max_goalDistance))
+    
+    def isStopped(self):
+        return not self.isActive
 
     def getParameters(self):
         return "{0:.4f},{1:.4f},{2:.4f},{3:.4f},{4:.4f},{5:.4f},{6:.4f},{7:.4f}".format(
