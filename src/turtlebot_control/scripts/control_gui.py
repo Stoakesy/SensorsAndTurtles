@@ -16,9 +16,9 @@ max_stop_distance  = 0.5
 max_reserved_a = 1
 max_reserved_b = 1
 
-default_linear_velocity = 0.13
-default_angular_velocity = 0.91
-default_slow_turn_multiplier = 0.2
+default_linear_velocity = 0.20
+default_angular_velocity = 0.3
+default_slow_turn_multiplier = 0.05
 default_pursuit_angle = 45
 default_stop_distance = 0.25
 default_reserved_a = 0.5
