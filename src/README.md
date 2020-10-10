@@ -6,8 +6,6 @@ As real hardware is used for this project instead of a simulation, a rosbag file
 
 The code provided within the zip package is all that is required to execute this demo. The complete project files, including calibration images and other resources used for debugging can be found on the [GitHub Repository](https://github.com/Stoakesy/SensorsAndTurtles)
 
-Lastly, a video has been provided walking through how the code can be tested without the use of real hardware. This is in addition to the main project video.
-
 ## System Requirements
 
 For this project, MATLAB R2020b is required. This is because of the use of the function `readAprilTag()` found in the computer vision toolbox, which was introduced from this release.
@@ -34,7 +32,9 @@ sudo apt-get install python3-pip
 pip3 install PyQt5==5.9.2
 ```
 
-If you receive an error when installing PyQT, additional packages may need to be installed (such as `setuptools`). This can be installed using `pip3`
+If you receive an error when installing PyQT, additional packages may need to be installed (such as `setuptools`). This can be installed using `pip3`.
+
+If for any reason the python GUI cannot be started, the system can still be demonstrated by playing back the GUI ROS data from the ROS bag file (see "Executing the Demo" below)
 
 The project was tested using `Ubuntu 16.04` and `18.04` with their recommended ROS versions. `Ubuntu 16.04` was used with the real hardware.
 
@@ -75,6 +75,8 @@ In the real hardware, image data is being published consistantly, hence this is 
 The provided ROS bag file `turtlebot_following_demo.bag` contains data relating to all the topics. For the sake of this demonstration, we only require data to be published to the topic `/camera/color/image_raw`. To do this, run the following command:
 
 `rosbag play ~/catkin_ws/src/rosbag/turtlebot_following_demo.bag --topics /camera/color/image_raw`
+
+If the python GUI above could not be initialised, playback the data published from this by adding the topic `/control_parameters` as an additional topic to playback.
 
 This will playback the image data for approximately 45 seconds. You can pause the publishing of data using the `space` key on the keyboard.
 
