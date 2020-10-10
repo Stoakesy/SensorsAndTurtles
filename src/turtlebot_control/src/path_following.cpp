@@ -156,8 +156,8 @@ bool PathFollowing::calculateVelocity(geometry_msgs::Twist &velocity)
     // If within angle, use proportional controller
     if (angle_ratio < 1.0)
     {
-      velocity.linear.x = /*MAX_LINEAR_VELOCITY*/ 0.2 * (1.0 - angle_ratio);
-      velocity.angular.z = direction * 0.6 /*MAX_ANGULAR_VELOCITY_SLOW*/ * angle_ratio;
+      velocity.linear.x = MAX_LINEAR_VELOCITY * (1.0 - angle_ratio);
+      velocity.angular.z = direction * MAX_ANGULAR_VELOCITY_SLOW * angle_ratio;
       std::cout << "Target within threshold. Angular ratio of " << angle_ratio << std::endl << std::endl;
     }
     // If outside of angle, simply turn
